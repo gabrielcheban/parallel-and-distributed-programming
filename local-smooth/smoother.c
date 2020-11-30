@@ -125,7 +125,6 @@ int main(int argc, char const *argv[]) {
     // setting image dimensions
     WIDTH = atof(argv[2]);
     HEIGHT = atof(argv[3]);
-    printf("%d, %d\n", WIDTH, HEIGHT);
 
     // file "descriptors"
     int fdi, fdo;
@@ -139,6 +138,7 @@ int main(int argc, char const *argv[]) {
     // dynamic allocation for images - calloc initialize arrays with zeros.
     // INPUT IMG is padded using zeros adding 2 rows and 2 coluns to its true dimensions
     // considering a 3x3 neighborhood.
+    // A image is a matrix using unsigned int to store all four values RGBA.
 
     INPUT_IMG = (unsigned int **) calloc(HEIGHT + 2, sizeof(unsigned int *));
     for (int i = 0; i < HEIGHT + 2; i++)
@@ -168,9 +168,8 @@ int main(int argc, char const *argv[]) {
             red_pixel = smooth_filter(i+1, j+1, RED_OFFSET);
             green_pixel = smooth_filter(i+1, j+1, GREEN_OFFSET);
             blue_pixel = smooth_filter(i+1, j+1, BLUE_OFFSET);
-            alpha = (INPUT_IMG[i+1][j+1] << 8 * 3) >> 8 * 3;
-            printf("red: %x \n green:%x \n blue: %x\n", red_pixel, green_pixel, blue_pixel);
-            printf("combined: %x\n", red_pixel | green_pixel | blue_pixel | alpha);
+            alpha = (INPUT_IMG[i+1][j+1] << 8 * 3) >> 8 * 3; // removing only RGB values
+
             SMOOTHED_IMG[i][j] = red_pixel | green_pixel | blue_pixel | alpha;
         }
         
