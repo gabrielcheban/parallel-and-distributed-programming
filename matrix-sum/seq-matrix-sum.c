@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mpi.h"
 
 int main(int argc, char **argv) {
 
@@ -19,15 +18,9 @@ int main(int argc, char **argv) {
 
   // Declaração das variáveis
   float **matrizA, **matrizB, **matrizR;
-  float *message;
-  int linha_offset;
-  int rank, size, qtd_processos, type;
-  MPI_Status status;
   FILE *arquivoA = NULL;
   FILE *arquivoB = NULL;
   FILE *arquivoR = NULL;
-
-  message = (float *) malloc(colunas*sizeof(float *));
 
   // Alocação dinâmica das matrizes
   matrizA = (float **) malloc(linhas*sizeof(float *));
@@ -58,51 +51,22 @@ int main(int argc, char **argv) {
   arquivoA = NULL;
   arquivoB = NULL;
 
-  // Inicializa MPI
-  MPI_Init(&argc, &argv);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-  // Trecho executado apenas pelo mestre
-  if (rank == 0){
-
-    for(int i = 0; i < linhas; i++){
-
-      // Recebe o resultado da linha i do processo [i%(size-1)+1]
-      MPI_Recv(&message[0], colunas, MPI_FLOAT, i%(size-1)+1, 99, MPI_COMM_WORLD, &status);
-
-      for(int j = 0; j < colunas; j++)
-        matrizR[i][j] = message[j];
-
-    }
-
-    // Salva os valores da matriz resultante em um arquivo
-    arquivoR = fopen("soma.txt", "w");
-
-    for(int i=0; i<linhas; i++){
-      for(int j=0; j<colunas; j++)
-        fprintf(arquivoR,"%.2f ", matrizR[i][j]);
-      fprintf(arquivoR,"\n");
-    }
-
-    fclose(arquivoR);
-    arquivoR = NULL;
+  for(int i = 0; i < linhas; i++) {
+    // Somando duas linhas
+    for(int j = 0; j < colunas; j++)
+      matrizR[i][j] = matrizA[i][j] + matrizB[i][j];
   }
 
-  // Trecho executado apenas pelos trabalhadores
-  else {
-    for(int i = rank-1; i < linhas; i = i+size-1) {
-
-      // Somando duas linhas
-      for(int j = 0; j < colunas; j++)
-        message[j] = matrizA[i][j] + matrizB[i][j];
-
-      // Manda o resultado da soma para o processo mestre
-      MPI_Send(&message[0], colunas, MPI_FLOAT, 0, 99, MPI_COMM_WORLD);
-    }
+  arquivoR = fopen("soma.txt", "w");
+  // Salva os valores da matriz resultante em um arquivo
+  for(int i=0; i<linhas; i++){
+    for(int j=0; j<colunas; j++)
+      fprintf(arquivoR,"%.2f ", matrizR[i][j]);
+    fprintf(arquivoR,"\n");
   }
 
-  MPI_Finalize();
+  fclose(arquivoR);
+  arquivoR = NULL;
 
   // Desaloca as matrizes
   for(int i=0; i<linhas; i++){
