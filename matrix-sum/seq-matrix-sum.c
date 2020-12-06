@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 int main(int argc, char **argv) {
 
@@ -21,6 +25,10 @@ int main(int argc, char **argv) {
   FILE *arquivoA = NULL;
   FILE *arquivoB = NULL;
   FILE *arquivoR = NULL;
+  
+    // variáveis para medida do tempo
+	struct timeval inic,fim;
+	struct rusage r1, r2;
 
   // Alocação dinâmica das matrizes
   matrizA = (float **) malloc(linhas*sizeof(float *));
@@ -51,11 +59,24 @@ int main(int argc, char **argv) {
   arquivoA = NULL;
   arquivoB = NULL;
 
+    // obtém tempo e consumo de CPU antes da aplicação do filtro
+	gettimeofday(&inic,0);
+	getrusage(RUSAGE_SELF, &r1);
+
   for(int i = 0; i < linhas; i++) {
     // Somando duas linhas
     for(int j = 0; j < colunas; j++)
       matrizR[i][j] = matrizA[i][j] + matrizB[i][j];
   }
+
+    // obtém tempo e consumo de CPU depois da aplicação do filtro
+	gettimeofday(&fim,0);
+	getrusage(RUSAGE_SELF, &r2);
+  
+  printf("\nElapsed time:%f sec\tUser time:%f sec\tSystem time:%f sec\n",
+	 (fim.tv_sec+fim.tv_usec/1000000.) - (inic.tv_sec+inic.tv_usec/1000000.),
+	 (r2.ru_utime.tv_sec+r2.ru_utime.tv_usec/1000000.) - (r1.ru_utime.tv_sec+r1.ru_utime.tv_usec/1000000.),
+	 (r2.ru_stime.tv_sec+r2.ru_stime.tv_usec/1000000.) - (r1.ru_stime.tv_sec+r1.ru_stime.tv_usec/1000000.));
 
   arquivoR = fopen("soma.txt", "w");
   // Salva os valores da matriz resultante em um arquivo

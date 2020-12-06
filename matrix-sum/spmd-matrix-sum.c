@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "mpi.h"
 
 int main(int argc, char **argv) {
@@ -26,6 +30,10 @@ int main(int argc, char **argv) {
   FILE *arquivoA = NULL;
   FILE *arquivoB = NULL;
   FILE *arquivoR = NULL;
+
+  // variáveis para medida do tempo
+	struct timeval inic,fim;
+	struct rusage r1, r2;
 
   message = (float *) malloc(colunas*sizeof(float *));
 
@@ -58,11 +66,15 @@ int main(int argc, char **argv) {
   arquivoA = NULL;
   arquivoB = NULL;
 
+  // obtém tempo e consumo de CPU antes da aplicação do filtro
+	gettimeofday(&inic,0);
+	getrusage(RUSAGE_SELF, &r1);
+
   // Inicializa MPI
   MPI_Init(&argc, &argv);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
+  
   // Trecho executado apenas pelo mestre
   if (rank == 0){
 
@@ -75,7 +87,15 @@ int main(int argc, char **argv) {
         matrizR[i][j] = message[j];
 
     }
+      // obtém tempo e consumo de CPU depois da aplicação do filtro
+    gettimeofday(&fim,0);
+    getrusage(RUSAGE_SELF, &r2);
 
+    printf("\nElapsed time:%f sec\tUser time:%f sec\tSystem time:%f sec\n",
+    (fim.tv_sec+fim.tv_usec/1000000.) - (inic.tv_sec+inic.tv_usec/1000000.),
+    (r2.ru_utime.tv_sec+r2.ru_utime.tv_usec/1000000.) - (r1.ru_utime.tv_sec+r1.ru_utime.tv_usec/1000000.),
+    (r2.ru_stime.tv_sec+r2.ru_stime.tv_usec/1000000.) - (r1.ru_stime.tv_sec+r1.ru_stime.tv_usec/1000000.));
+    
     // Salva os valores da matriz resultante em um arquivo
     arquivoR = fopen("soma.txt", "w");
 
