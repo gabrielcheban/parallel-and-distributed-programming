@@ -78,16 +78,16 @@ int main(int argc, char **argv) {
 	 (r2.ru_utime.tv_sec+r2.ru_utime.tv_usec/1000000.) - (r1.ru_utime.tv_sec+r1.ru_utime.tv_usec/1000000.),
 	 (r2.ru_stime.tv_sec+r2.ru_stime.tv_usec/1000000.) - (r1.ru_stime.tv_sec+r1.ru_stime.tv_usec/1000000.));
 
-  // arquivoR = fopen("soma.txt", "w");
-  // // Salva os valores da matriz resultante em um arquivo
-  // for(int i=0; i<linhas; i++){
-  //   for(int j=0; j<colunas; j++)
-  //     fprintf(arquivoR,"%.2f ", matrizR[i][j]);
-  //   fprintf(arquivoR,"\n");
-  // }
+  arquivoR = fopen("soma.txt", "w");
+  // Salva os valores da matriz resultante em um arquivo
+  for(int i=0; i<linhas; i++){
+    for(int j=0; j<colunas; j++)
+      fprintf(arquivoR,"%.2f ", matrizR[i][j]);
+    fprintf(arquivoR,"\n");
+  }
 
-  // fclose(arquivoR);
-  // arquivoR = NULL;
+  fclose(arquivoR);
+  arquivoR = NULL;
 
   // Desaloca as matrizes
   for(int i=0; i<linhas; i++){
