@@ -23,8 +23,7 @@ int main(int argc, char **argv) {
 
   // Declaração das variáveis
   float *message, *linhaA, *linhaB;
-  int linha_offset;
-  int rank, size, qtd_processos, type;
+  int rank, size;
   MPI_Status status;
 
   // variáveis para medida do tempo
@@ -58,7 +57,7 @@ int main(int argc, char **argv) {
     matrizB = (float **) malloc(linhas*sizeof(float *));
     matrizR = (float **) malloc(linhas*sizeof(float *));
 
-    for(int i=0; i<linhas; i++){
+    for(int i = 0; i < linhas; i++){
       matrizA[i] = (float *) malloc(colunas*sizeof(float));
       matrizB[i] = (float *) malloc(colunas*sizeof(float));
       matrizR[i] = (float *) malloc(colunas*sizeof(float));
@@ -69,8 +68,8 @@ int main(int argc, char **argv) {
     arquivoB = fopen(argv[2], "r");
 
     // Leitura dos arquivos
-    for(int i=0; i<linhas; i++){
-      for(int j=0; j<colunas; j++){
+    for(int i = 0; i < linhas; i++){
+      for(int j = 0; j < colunas; j++){
         fscanf(arquivoA,"%f ", &matrizA[i][j]);
         fscanf(arquivoB,"%f ", &matrizB[i][j]);
       }
@@ -84,11 +83,11 @@ int main(int argc, char **argv) {
 
     // printf("Arquivos lidos e fechados\n");
 
-    // obtém tempo e consumo de CPU antes da aplicação do filtro
+    // Obtém tempo e consumo de CPU antes da aplicação do filtro
   	gettimeofday(&inic,0);
   	getrusage(RUSAGE_SELF, &r1);
 
-    for(int i = 0; i < linhas; i+=size-1){
+    for(int i = 0; i < linhas; i += size-1){
       for(int p = 1; p < size; p++){
         if(i+p-1 < linhas){
 
@@ -117,21 +116,21 @@ int main(int argc, char **argv) {
     }
 
     // Obtém tempo e consumo de CPU depois da aplicação do filtro
-    gettimeofday(&fim,0);
+    gettimeofday(&fim, 0);
     getrusage(RUSAGE_SELF, &r2);
 
     printf("\nElapsed time:%f sec\tUser time:%f sec\tSystem time:%f sec\n",
-    (fim.tv_sec+fim.tv_usec/1000000.) - (inic.tv_sec+inic.tv_usec/1000000.),
-    (r2.ru_utime.tv_sec+r2.ru_utime.tv_usec/1000000.) - (r1.ru_utime.tv_sec+r1.ru_utime.tv_usec/1000000.),
-    (r2.ru_stime.tv_sec+r2.ru_stime.tv_usec/1000000.) - (r1.ru_stime.tv_sec+r1.ru_stime.tv_usec/1000000.));
+    (fim.tv_sec + fim.tv_usec/1000000.) - (inic.tv_sec + inic.tv_usec/1000000.),
+    (r2.ru_utime.tv_sec + r2.ru_utime.tv_usec/1000000.) - (r1.ru_utime.tv_sec + r1.ru_utime.tv_usec/1000000.),
+    (r2.ru_stime.tv_sec + r2.ru_stime.tv_usec/1000000.) - (r1.ru_stime.tv_sec + r1.ru_stime.tv_usec/1000000.));
     
     // Salva os valores da matriz resultante em um arquivo
     arquivoR = fopen("soma.txt", "w");
     
-    for(int i=0; i<linhas; i++){
-      for(int j=0; j<colunas; j++)
-        fprintf(arquivoR,"%.2f ", matrizR[i][j]);
-      fprintf(arquivoR,"\n");
+    for(int i = 0; i < linhas; i++){
+      for(int j = 0; j < colunas; j++)
+        fprintf(arquivoR, "%.2f ", matrizR[i][j]);
+      fprintf(arquivoR, "\n");
     }
     
     fclose(arquivoR);
