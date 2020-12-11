@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
   FILE *arquivoA = NULL;
   FILE *arquivoB = NULL;
   FILE *arquivoR = NULL;
-  
+
     // variáveis para medida do tempo
 	struct timeval inic,fim;
 	struct rusage r1, r2;
@@ -72,22 +72,22 @@ int main(int argc, char **argv) {
     // obtém tempo e consumo de CPU depois da aplicação do filtro
 	gettimeofday(&fim,0);
 	getrusage(RUSAGE_SELF, &r2);
-  
+
   printf("\nElapsed time:%f sec\tUser time:%f sec\tSystem time:%f sec\n",
 	 (fim.tv_sec+fim.tv_usec/1000000.) - (inic.tv_sec+inic.tv_usec/1000000.),
 	 (r2.ru_utime.tv_sec+r2.ru_utime.tv_usec/1000000.) - (r1.ru_utime.tv_sec+r1.ru_utime.tv_usec/1000000.),
 	 (r2.ru_stime.tv_sec+r2.ru_stime.tv_usec/1000000.) - (r1.ru_stime.tv_sec+r1.ru_stime.tv_usec/1000000.));
 
-  arquivoR = fopen("soma.txt", "w");
-  // Salva os valores da matriz resultante em um arquivo
-  for(int i=0; i<linhas; i++){
-    for(int j=0; j<colunas; j++)
-      fprintf(arquivoR,"%.2f ", matrizR[i][j]);
-    fprintf(arquivoR,"\n");
-  }
+  // arquivoR = fopen("soma.txt", "w");
+  // // Salva os valores da matriz resultante em um arquivo
+  // for(int i=0; i<linhas; i++){
+  //   for(int j=0; j<colunas; j++)
+  //     fprintf(arquivoR,"%.2f ", matrizR[i][j]);
+  //   fprintf(arquivoR,"\n");
+  // }
 
-  fclose(arquivoR);
-  arquivoR = NULL;
+  // fclose(arquivoR);
+  // arquivoR = NULL;
 
   // Desaloca as matrizes
   for(int i=0; i<linhas; i++){
